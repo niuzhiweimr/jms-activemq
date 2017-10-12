@@ -1,0 +1,115 @@
+package com.mq.message;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import com.mq.util.DateUtil;
+
+//命令消息对象
+@XmlRootElement(name = "command")
+public class MsgCommand implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3568403169409653434L;
+	// 系统
+	private String srcSys;
+	// 命令类别
+	private String cmd;
+	// 命令token,最长32位，原系统发起，原系统保持唯一，需要目标系统响应此命令的，目标系统负责将此token返回，字段名称srcToken
+	private String token;
+	// 返回原系统的token
+	private String srcToken;
+	// 消息体
+	private String msgBody;
+	// 扩展说明 可以空
+	private String ext;
+	// 消息类型
+	private String msgType;
+	// 系统发起时间,默认为当前时间
+	private int cmdTime = DateUtil.getCurTimeInSec();
+
+	public MsgCommand() {
+		super();
+	}
+
+	public MsgCommand(String srcSys) {
+		super();
+		this.srcSys = srcSys;
+	}
+
+	public String getSrcSys() {
+		return srcSys;
+	}
+
+	@XmlElement
+	public void setSrcSys(String srcSys) {
+		this.srcSys = srcSys;
+	}
+
+	public String getCmd() {
+		return cmd;
+	}
+
+	@XmlElement
+	public void setCmd(String cmd) {
+		this.cmd = cmd;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	@XmlElement
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getSrcToken() {
+		return srcToken;
+	}
+
+	@XmlElement
+	public void setSrcToken(String srcToken) {
+		this.srcToken = srcToken;
+	}
+
+	public String getMsgBody() {
+		return msgBody;
+	}
+
+	@XmlElement
+	public void setMsgBody(String msgBody) {
+		this.msgBody = msgBody;
+	}
+
+	public String getExt() {
+		return ext;
+	}
+
+	@XmlElement
+	public void setExt(String ext) {
+		this.ext = ext;
+	}
+
+	public String getMsgType() {
+		return msgType;
+	}
+
+	@XmlElement
+	public void setMsgType(String msgType) {
+		this.msgType = msgType;
+	}
+
+	public int getCmdTime() {
+		return cmdTime;
+	}
+
+	@XmlElement
+	public void setCmdTime(int cmdTime) {
+		this.cmdTime = cmdTime;
+	}
+
+}

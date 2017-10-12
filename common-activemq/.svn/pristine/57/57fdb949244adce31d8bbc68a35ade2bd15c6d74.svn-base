@@ -1,0 +1,82 @@
+package com.mq.service.impl;
+
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import org.apache.log4j.Logger;
+
+import com.mq.constant.Constant;
+import com.mq.service.IMessageQueueSender;
+import com.mq.util.ActiveMqConnectionUtil;
+
+public class MessageQueueSender implements IMessageQueueSender {
+
+	private static Logger logger = Logger.getLogger(MessageQueueSender.class);
+
+	// 发送文本消息
+	public void sendQueueTextMessage(String message) {
+
+		Session session = null;
+		Destination destination = null;
+		try {
+			// 获取session
+			session = ActiveMqConnectionUtil.getSession();
+			// 消息的目的地
+			destination = session.createQueue(Constant.MQ_MESSAGE_QUEUE);
+			// 消息生产者
+			MessageProducer producer = session.createProducer(destination);
+			// 消息持久化
+			producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+			// 发送文本消息
+			TextMessage textMessage = session.createTextMessage(message);
+			// 发送消息
+			producer.send(textMessage);
+			// session提交
+			session.commit();
+
+			logger.info("对列文本消息发送成功");
+		} catch (JMSException e) {
+			logger.error(e.getMessage());
+		} finally {
+			if (session != null) {
+				try {
+					// 关闭session
+					session.close();
+				} catch (JMSException e) {
+					logger.error(e.getMessage());
+				}
+			}
+		}
+	}
+
+	// 发送键对值消息
+	public void sendQueueMapMessage(MapMessage mapMessage) {
+		Session session = null;
+		Destination destination = null;
+		try {
+			// 获取session
+			session = ActiveMqConnectionUtil.getSession();
+			// 消息的目的地
+			destination = session.createQueue(Constant.MQ_MESSAGE_QUEUE);
+			// 消息生产者
+			MessageProducer producer = session.createProducer(destination);
+			// 消息持久化
+			producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+			// 发送消息
+			producer.send(mapMessage);
+			// session提交
+			session.commit();
+			// 关闭session
+			session.close();
+			logger.info("对列键对值消息发送成功");
+		} catch (JMSException e) {
+			logger.error(e.getMessage());
+		}
+
+	}
+}

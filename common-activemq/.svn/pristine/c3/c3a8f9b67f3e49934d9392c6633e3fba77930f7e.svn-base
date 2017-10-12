@@ -1,0 +1,13 @@
+package com.mq.service;
+
+import javax.jms.MapMessage;
+
+public interface IMessageTopicSender {
+
+	// 发送订阅文本消息
+	void sendTopicTextMessage(String message);
+
+	// 发送订阅键对值消息
+
+	void sendTopicMapMessage(MapMessage mapMessage);
+}

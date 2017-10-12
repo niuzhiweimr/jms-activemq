@@ -1,0 +1,24 @@
+package com.mq.call;
+
+import com.mq.message.MsgCommand;
+
+/**
+ * 
+ * @author niuzhiwei
+ *         <p>
+ *         消息处理类
+ * 
+ */
+public abstract class MessageReceiverCall {
+
+	// 订阅模式调用
+	public static void topicMessageReceiverCall(MsgCommand cmd) {
+
+	}
+
+	// 队列模式调用
+	public static void queueMessageReceiverCall(MsgCommand cmd) {
+
+	}
+
+}

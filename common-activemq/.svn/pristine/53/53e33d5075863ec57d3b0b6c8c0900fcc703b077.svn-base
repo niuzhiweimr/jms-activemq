@@ -1,0 +1,119 @@
+package com.mq.call;
+
+import java.io.ByteArrayOutputStream;
+
+import javax.jms.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+import org.apache.log4j.Logger;
+
+import com.mq.message.MsgCommand;
+import com.mq.constant.Constant;
+import com.mq.exception.MsgException;
+import com.mq.handler.MessageInvocationHandler;
+import com.mq.service.IMessageQueueSender;
+import com.mq.service.IMessageTopicSender;
+import com.mq.service.impl.*;
+import com.mq.util.ActiveMqConnectionUtil;
+
+/**
+ * 
+ * @author niuzhiwei
+ *         <p>
+ *         消息处理类
+ * 
+ */
+public class MessageSendCall {
+
+	private static Logger logger = Logger.getLogger(MessageSendCall.class);
+
+	public static boolean flag = true;
+
+	// 静态块在类执行初始化是 执行静态块中的所有监听
+	static {
+		try {
+			if (flag) {
+				// 初始化topic发布/订阅监听
+				Connection topicConnection = ActiveMqConnectionUtil.getConnection();
+				topicConnection.start();
+				Session topicSession = topicConnection.createSession(true, Session.AUTO_ACKNOWLEDGE);
+				Destination topicDestination = topicSession.createTopic(Constant.MQ_MESSAGE_TOPIC);
+				MessageConsumer topicMessageConsumer = topicSession.createConsumer(topicDestination);
+				topicMessageConsumer.setMessageListener(new MessageTopicReceiver());
+				// 初始queue队列监听
+				Connection queueConnection = ActiveMqConnectionUtil.getConnection();
+				topicConnection.start();
+				Session queueSession = queueConnection.createSession(true, Session.AUTO_ACKNOWLEDGE);
+				Destination queueDestination = queueSession.createQueue(Constant.MQ_MESSAGE_QUEUE);
+				MessageConsumer queueMessageConsumer = queueSession.createConsumer(queueDestination);
+				queueMessageConsumer.setMessageListener(new MessageQueueReceiver());
+				System.out.println("初始化监听成功");
+			}
+			flag = false;
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	// 消息发送动态代理
+	public synchronized static void topicProxyMessageSend(MsgCommand cmd) throws MsgException {
+		// 实例化代理对象
+		MessageInvocationHandler messageInvocationHandler = new MessageInvocationHandler(new MessageTopicSender());
+		// 进行对象绑定
+		IMessageTopicSender messageTopicSend = (IMessageTopicSender) messageInvocationHandler
+				.bind(new MessageTopicSender());
+		try {
+			// 命令对象不能空 ，发送消息对象不能空
+			boolean isNull = cmd == null ? true : false;
+			if (isNull)
+				return;
+			// 实现xml与对象的互转
+			JAXBContext context = JAXBContext.newInstance(MsgCommand.class);
+			// 根据上下文获取marshaller对象
+			Marshaller marshaller = context.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			// 设置编码字符集
+			// 格式化XML输出，有分行和缩进
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			marshaller.marshal(cmd, baos);
+			String xmlObj = new String(baos.toByteArray());
+			messageTopicSend.sendTopicTextMessage(xmlObj);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	// 消息发送动态代理
+	public synchronized static void queueProxyMessageSend(MsgCommand cmd) throws MsgException {
+		// 实例化代理对象
+		MessageInvocationHandler messageInvocationHandler = new MessageInvocationHandler(new MessageQueueSender());
+		// 进行对象绑定
+		IMessageQueueSender messageQueueSend = (IMessageQueueSender) messageInvocationHandler
+				.bind(new MessageQueueSender());
+
+		try {
+			// 命令对象不能空 ，发送消息对象不能空
+			boolean isNull = cmd == null ? true : false;
+			if (isNull)
+				return;
+			// 实现xml与对象的互转
+			JAXBContext context = JAXBContext.newInstance(MsgCommand.class);
+			// 根据上下文获取marshaller对象
+			Marshaller marshaller = context.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			// 设置编码字符集
+			// 格式化XML输出，有分行和缩进
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			marshaller.marshal(cmd, baos);
+			String xmlObj = new String(baos.toByteArray());
+			messageQueueSend.sendQueueTextMessage(xmlObj);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+}

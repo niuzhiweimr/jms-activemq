@@ -1,0 +1,25 @@
+package com.mq.test;
+
+import com.mq.call.*;
+import com.mq.exception.MsgException;
+import com.mq.message.MsgCommand;
+
+public class TestMessageSend extends MessageReceiverCall {
+	// 消息测试
+	public static void main(String[] args) {
+		MsgCommand cmd = CommandFactory.getMsgCommand();
+		cmd.setCmd("123");
+		try {
+			MessageSendCall.topicProxyOjbectMessageSend(cmd);
+		} catch (MsgException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 消息处理重载测试,可能应为系统环境原因无法重载 可开启多系统环境测试
+	@Override
+	public void topicObjectMessageReceiverCall(MsgCommand cmd) {
+		System.out.println(cmd.getCmd());
+	}
+
+}

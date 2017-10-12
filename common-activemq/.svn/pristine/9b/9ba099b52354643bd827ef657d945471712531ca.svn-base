@@ -1,0 +1,6 @@
+package com.mq.service;
+
+public interface IMessageSender {
+
+	void sendMessage(String message);
+}

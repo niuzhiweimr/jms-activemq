@@ -1,0 +1,13 @@
+package com.mq.service;
+
+import javax.jms.MapMessage;
+
+public interface IMessageQueueSender {
+
+	// 发送队列文本消息
+	void sendQueueTextMessage(String message);
+
+	// 发送队列键对值消息
+	
+	void sendQueueMapMessage(MapMessage mapMessage);
+}

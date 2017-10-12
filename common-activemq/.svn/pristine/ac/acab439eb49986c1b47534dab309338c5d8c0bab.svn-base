@@ -1,0 +1,9 @@
+package com.mq.service.impl;
+
+import javax.jms.MapMessage;
+
+import com.mq.service.IMessageSender;
+
+public class MessageTopicSender {
+
+}

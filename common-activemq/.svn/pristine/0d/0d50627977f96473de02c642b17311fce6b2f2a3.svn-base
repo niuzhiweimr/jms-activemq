@@ -1,0 +1,10 @@
+package com.mq.service;
+
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+public interface IMessageReceiver {
+
+	public void onMessage(TextMessage message, Session session) throws JMSException;
+}

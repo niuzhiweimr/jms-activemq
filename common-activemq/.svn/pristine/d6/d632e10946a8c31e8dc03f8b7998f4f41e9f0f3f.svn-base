@@ -1,0 +1,24 @@
+					消息服务器 分布式系统中间件开发
+
+项目功能概览
+		1:消息发送调用（完成）MessageSendCall
+				消息发送主调用入口实现了:
+					1)textMessage消息发送（topic/queue）
+					1)ObjectMessage消息发送（topic/queue）
+		2:消息接收处理（完成）MessageReceiverCall
+			消息监听业务处理实现了:
+					1)textMessage消息处理（topic/queue）
+					1)ObjectMessage消息处理（topic/queue）
+		3:消息命令工厂 （完成）CommandFactory
+			主要用于生产MsgCommand对象，加入了缓存，防止系统消息交互频繁，的内存溢出
+								加入了线程锁 防止多线程情况下的数据混乱
+		4:消息服务器连接配置读取（完成）Constant
+			主要用于读取jms.properties的配置
+		5:连接池  ActiveMqConnectionUtil
+			主要用于生产Connection连接
+		6:tomcat启动自动订阅 StartEvent
+			StartEvent实现了ServletContextListener（servlet上下文监听器）
+引入项目需要在web.xml加入监听
+	<listener>
+		<listener-class>com.mq.event.StartEvent</listener-class>
+	</listener>

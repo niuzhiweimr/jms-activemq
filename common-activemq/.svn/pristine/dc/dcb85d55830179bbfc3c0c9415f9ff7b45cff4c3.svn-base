@@ -1,0 +1,9 @@
+databaseDriver = com.mysql.jdbc.Driver
+username =root
+password =111111
+url =jdbc\:mysql\://localhost\:3306/kjplus?useUnicode\=true&characterEncoding\=UTF-8
+jms_brokerURL=tcp\://localhost\:61616
+jms_userName=admin
+jms_password=admin
+jms_messageTopic=jms.Topic.message
+jms_messageQueue=jms.Queue.message

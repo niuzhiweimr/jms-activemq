@@ -1,0 +1,75 @@
+package com.mq.util;
+
+import javax.jms.Connection;
+import javax.jms.JMSException;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.log4j.Logger;
+
+import com.mq.constant.Constant;
+
+/**
+ * 
+ * @author niuzhiwei
+ *         <p>
+ *         消息服务器连接工厂
+ *         <p>
+ *         final修饰不可以被继承
+ *         <p>
+ *         类用final修改 类中方法也用final修改为了保证调用安全 类不可被继承, 就无法重载类中方法
+ */
+public final class ActiveMqConnectionUtil {
+
+	private static Logger logger = Logger.getLogger(ActiveMqConnectionUtil.class);
+
+	private static PooledConnectionFactory pooledConnectionFactory;
+	// 这里使用静态块 在jvm启动 加载类的初始化是 首先执行静态块 常见jms消息服务器连接
+	static {
+		try {
+			// 需要创建一个链接工厂然后设置到连接池中
+			ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
+			activeMQConnectionFactory.setUserName(Constant.MQ_USERNAME);
+			activeMQConnectionFactory.setPassword(Constant.MQ_PASSWORD);
+			activeMQConnectionFactory.setBrokerURL(Constant.MQ_BROKERURL);
+			// 如果将消息工厂作为属性设置则会有类型不匹配的错误，虽然Spring配置文件中是这么配置的，这里必须在初始化的时候设置进去
+			pooledConnectionFactory = new PooledConnectionFactory(activeMQConnectionFactory);
+			// 链接最大活跃数，为了在测试中区别我们使用的到底是不是一个对象和看是否能控制连接数(实际上是会话数)，我们在这里设置为1
+			int maximumActive = 50;
+			pooledConnectionFactory.setMaxConnections(maximumActive);
+			pooledConnectionFactory.setMaximumActiveSessionPerConnection(maximumActive);
+		} catch (Exception e) {
+			logger.error("jms静态块初始化连接失败" + e.getMessage());
+		}
+	}
+
+	/**
+	 * 获得链接池工厂
+	 */
+	public static PooledConnectionFactory getPooledConnectionFactory() {
+		return pooledConnectionFactory;
+	}
+
+	/**
+	 * 对象回收销毁时停止链接
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		pooledConnectionFactory.stop();
+		super.finalize();
+	}
+
+	/**
+	 * 获取jms连接
+	 */
+	public static Connection getConnection() {
+		Connection connection = null;
+		try {
+			connection = getPooledConnectionFactory().createConnection();
+			logger.info("jms获取Connection连接成功" + connection);
+		} catch (JMSException e) {
+			logger.error("jms获取Connection连接失败" + e.getMessage());
+		}
+		return connection;
+	}
+}

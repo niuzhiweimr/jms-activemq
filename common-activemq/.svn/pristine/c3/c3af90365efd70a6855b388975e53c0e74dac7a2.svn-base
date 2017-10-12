@@ -1,0 +1,11 @@
+package com.mq.service.impl;
+
+import com.mq.service.IMessageSender;
+
+public class MessageSender implements IMessageSender {
+
+	public void sendMessage(String message) {
+		System.out.println(message);
+	}
+
+}

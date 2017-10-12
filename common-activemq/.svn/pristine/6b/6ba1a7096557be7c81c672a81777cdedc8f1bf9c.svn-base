@@ -1,0 +1,35 @@
+package com.mq.call;
+
+import com.mq.service.IMessageSender;
+import com.mq.service.impl.MessageQueueSender;
+import com.mq.service.impl.MessageTopicSender;
+import com.mq.util.ActiveMqConnectionUtil;
+
+/**
+ * 
+ * @author niuzhiwei
+ *         <p>
+ *         消息处理类
+ * 
+ */
+public class MessageHandler {
+
+	public static void main(String[] args) {
+		ProxyMessageSend("helloWord");
+		ActiveMqConnectionUtil.getSession();
+		System.out.println("获取session成功");
+
+	}
+
+	// 消息发送动态代理
+	public synchronized static void ProxyMessageSend(String message) {
+		// 实例化代理对象
+		MessageInvocationHandler messageInvocationHandler = new MessageInvocationHandler(new MessageQueueSender());
+		// 进行对象绑定
+		IMessageSender messageQueueSend = (IMessageSender) messageInvocationHandler.bind(new MessageQueueSender());
+		/*IMessageSender messageTopicSend = (IMessageSender) messageInvocationHandler.bind(new MessageTopicSender());*/
+		// 绑定对象的方法
+		messageQueueSend.sendQueueTextMessage(message);
+	}
+
+}

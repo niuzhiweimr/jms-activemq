@@ -1,0 +1,37 @@
+package com.mq.handler;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+/**
+ * 
+ * @author niuzhiwei
+ *         <p>
+ *         通过动态代理 代理对象访问目标对象 处理消息的(发送)
+ * 
+ */
+public final class MessageInvocationHandler implements InvocationHandler {
+
+	private Object target;
+
+	public MessageInvocationHandler(Object target) {
+		this.target = target;
+	}
+
+	/**
+	 * 绑定业务对象并返回一个代理类
+	 */
+	public Object bind(Object target) {
+
+		// 通过反射机制，创建一个代理类对象实例并返回。用户进行方法调用时使用
+		// 创建代理对象时，需要传递该业务类的类加载器（用来获取业务实现类的元数据，在包装方法是调用真正的业务方法）、接口、handler实现类
+		return Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(), this);
+	}
+
+	// 实现动态代理invoke方法
+	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		Object retVal = method.invoke(target, args);
+		return retVal;
+	}
+}
