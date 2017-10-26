@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mq.call.MessageReceiverEvent;
+import com.mq.call.MessageReceiverCallEvent;
 import com.mq.constant.Constant;
 import com.mq.message.MsgCommand;
 import com.mq.util.FatchApplicationContext;
@@ -18,20 +18,18 @@ import com.mq.util.FatchApplicationContext;
  * 
  * @author niuzhiwei
  *         <p>
- *         mq（Queue）消息处理类
+ *         mq（Topic）消息处理类
  *         <p>
  *         各种消息的处理机制示例代码
- *         <p>
- *         产生消息事件
  * 
  */
 @Transactional
 @Component
-public class MessageQueueReceiverHandler {
+public class MessageTopicReceiverHandler {
 
-	private static Logger logger = Logger.getLogger(MessageQueueReceiverHandler.class);
+	private static Logger logger = Logger.getLogger(MessageTopicReceiverHandler.class);
 
-	public void queueTextMessageHandler(final TextMessage textMessage) {
+	public void topicTextMessageHandler(final TextMessage textMessage) {
 
 		JAXBContext context2;
 		try {
@@ -40,10 +38,8 @@ public class MessageQueueReceiverHandler {
 			Unmarshaller unmarshaller = context2.createUnmarshaller();
 			MsgCommand cmd = (MsgCommand) unmarshaller.unmarshal(new StringReader(cmdMessage));
 			logger.info("收到的cmd命令为" + cmd.getMsgBody());
-			// 事件源就就是本类
 			FatchApplicationContext.getApplicationContext().publishEvent(
-					new MessageReceiverEvent(this, cmd, Constant.MSG_TYPE_TEXT, Constant.LISTER_TYPE_QUEUE));
-
+					new MessageReceiverCallEvent(this, cmd, Constant.MSG_TYPE_TEXT, Constant.LISTER_TYPE_TOPIC));
 		} catch (JAXBException e) {
 			logger.error(e.getMessage());
 		} catch (JMSException e) {
@@ -51,7 +47,7 @@ public class MessageQueueReceiverHandler {
 		}
 	}
 
-	public void queueMapMessageHandler(final MapMessage mapMessage) {
+	public void topicMapMessageHandler(final MapMessage mapMessage) {
 		try {
 			// 通过key查询
 			mapMessage.getBoolean("");
@@ -65,14 +61,14 @@ public class MessageQueueReceiverHandler {
 			mapMessage.getShort("");
 			mapMessage.getString("");
 			FatchApplicationContext.getApplicationContext().publishEvent(
-					new MessageReceiverEvent(this, mapMessage, Constant.MSG_TYPE_MAP, Constant.LISTER_TYPE_QUEUE));
+					new MessageReceiverCallEvent(this, mapMessage, Constant.MSG_TYPE_MAP, Constant.LISTER_TYPE_TOPIC));
 		} catch (JMSException e) {
 			logger.error(e.getMessage());
 		}
+
 	}
 
-	public void queueStreamMessageHandler(final StreamMessage streamMessage) {
-
+	public void topicStreamMessageHandler(final StreamMessage streamMessage) {
 		try {
 			streamMessage.readBoolean();
 			streamMessage.readByte();
@@ -85,15 +81,14 @@ public class MessageQueueReceiverHandler {
 			streamMessage.readShort();
 			streamMessage.readString();
 			FatchApplicationContext.getApplicationContext().publishEvent(
-					new MessageReceiverEvent(this, streamMessage, Constant.MSG_TYPE_STREAM,
-							Constant.LISTER_TYPE_QUEUE));
+					new MessageReceiverCallEvent(this, streamMessage, Constant.MSG_TYPE_STREAM,
+							Constant.LISTER_TYPE_TOPIC));
 		} catch (JMSException e) {
 			logger.error(e.getMessage());
 		}
 	}
 
-	public void queueBytesMessageHandler(final BytesMessage bytesMessage) {
-
+	public void topicBytesMessageHandler(final BytesMessage bytesMessage) {
 		byte[] bytes = new byte[1024];
 		int len = -1;
 		String str = null;
@@ -107,13 +102,14 @@ public class MessageQueueReceiverHandler {
 		}
 	}
 
-	public void queueObjectMessageHandler(final ObjectMessage objectMessage) {
+	public void topicObjectMessageHandler(final ObjectMessage objectMessage) {
 
 		try {
 			MsgCommand cmd = (MsgCommand) objectMessage.getObject();
 			FatchApplicationContext.getApplicationContext().publishEvent(
-					new MessageReceiverEvent(this, cmd, Constant.MSG_TYPE_OBJECT, Constant.LISTER_TYPE_QUEUE));
-		} catch (JMSException e) {
+					new MessageReceiverCallEvent(this, cmd, Constant.MSG_TYPE_OBJECT, Constant.LISTER_TYPE_TOPIC));
+			logger.info("消息事件发送成功");
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 	}

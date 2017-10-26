@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mq.call.MessageReceiverEvent;
+import com.mq.call.MessageReceiverCallEvent;
 import com.mq.constant.Constant;
 import com.mq.message.MsgCommand;
 import com.mq.util.FatchApplicationContext;
@@ -42,7 +42,7 @@ public class MessageQueueReceiverHandler {
 			logger.info("收到的cmd命令为" + cmd.getMsgBody());
 			// 事件源就就是本类
 			FatchApplicationContext.getApplicationContext().publishEvent(
-					new MessageReceiverEvent(this, cmd, Constant.MSG_TYPE_TEXT, Constant.LISTER_TYPE_QUEUE));
+					new MessageReceiverCallEvent(this, cmd, Constant.MSG_TYPE_TEXT, Constant.LISTER_TYPE_QUEUE));
 
 		} catch (JAXBException e) {
 			logger.error(e.getMessage());
@@ -65,7 +65,7 @@ public class MessageQueueReceiverHandler {
 			mapMessage.getShort("");
 			mapMessage.getString("");
 			FatchApplicationContext.getApplicationContext().publishEvent(
-					new MessageReceiverEvent(this, mapMessage, Constant.MSG_TYPE_MAP, Constant.LISTER_TYPE_QUEUE));
+					new MessageReceiverCallEvent(this, mapMessage, Constant.MSG_TYPE_MAP, Constant.LISTER_TYPE_QUEUE));
 		} catch (JMSException e) {
 			logger.error(e.getMessage());
 		}
@@ -85,7 +85,7 @@ public class MessageQueueReceiverHandler {
 			streamMessage.readShort();
 			streamMessage.readString();
 			FatchApplicationContext.getApplicationContext().publishEvent(
-					new MessageReceiverEvent(this, streamMessage, Constant.MSG_TYPE_STREAM,
+					new MessageReceiverCallEvent(this, streamMessage, Constant.MSG_TYPE_STREAM,
 							Constant.LISTER_TYPE_QUEUE));
 		} catch (JMSException e) {
 			logger.error(e.getMessage());
@@ -112,7 +112,7 @@ public class MessageQueueReceiverHandler {
 		try {
 			MsgCommand cmd = (MsgCommand) objectMessage.getObject();
 			FatchApplicationContext.getApplicationContext().publishEvent(
-					new MessageReceiverEvent(this, cmd, Constant.MSG_TYPE_OBJECT, Constant.LISTER_TYPE_QUEUE));
+					new MessageReceiverCallEvent(this, cmd, Constant.MSG_TYPE_OBJECT, Constant.LISTER_TYPE_QUEUE));
 		} catch (JMSException e) {
 			logger.error(e.getMessage());
 		}

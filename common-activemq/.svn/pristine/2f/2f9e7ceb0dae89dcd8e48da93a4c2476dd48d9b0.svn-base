@@ -18,13 +18,13 @@ public class Constant {
 	// 消息服务器密码
 	public static final String MQ_PASSWORD = ResourceBundle.getBundle("jms", Locale.CHINA).getString("jms_password");
 	// 消息服务器订阅模式发布者名称
-	public static final String MQ_MESSAGE_TOPIC = ResourceBundle.getBundle("jms", Locale.CHINA)
-			.getString("jms_messageTopic");
+	public static final String MQ_MESSAGE_TOPIC = ResourceBundle.getBundle("jms", Locale.CHINA).getString(
+			"jms_messageTopic");
 	// 消息服务器队列模式发送者名称
-	public static final String MQ_MESSAGE_QUEUE = ResourceBundle.getBundle("jms", Locale.CHINA)
-			.getString("jms_messageQueue");
+	public static final String MQ_MESSAGE_QUEUE = ResourceBundle.getBundle("jms", Locale.CHINA).getString(
+			"jms_messageQueue");
 
-	// 监听类型（queue队列/topic发布订阅）
+	// 消息监听类型
 	public static final String LISTER_TYPE_QUEUE = "queue";
 	public static final String LISTER_TYPE_TOPIC = "topic";
 
